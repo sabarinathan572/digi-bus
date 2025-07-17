@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Ticket Booking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            background-image: url('https://okcredit-blog-images-prod.storage.googleapis.com/2021/01/bus1.jpg'); /* Replace with your bus image URL */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            height: 100vh;
+        }
+
+        header {
+            background-color: rgba(0, 68, 204, 0.7); /* Semi-transparent blue */
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        header .logo h1 {
+            margin: 0;
+            font-size: 36px;
+        }
+
+        main {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .booking-form {
+            background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white */
+            border-radius: 8px;
+            padding: 30px;
+            width: 400px;
+            margin: 50px auto;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .booking-form h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .booking-form label {
+            display: block;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        .booking-form input, .booking-form select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .booking-form button {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .booking-form button:hover {
+            background-color: #218838;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        .confirmation-message {
+            display: none;
+            background-color: #28a745;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .seat-selection {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .seat {
+            width: 40px;
+            height: 40px;
+            margin: 10px;
+            background-color: #ccc;
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .seat.selected {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .seat.booked {
+            background-color: #d9534f;
+            color: white;
+            cursor: not-allowed;
+        }
+
+        .seat-label {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        .payment-methods {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .payment-methods input {
+            margin-right: 10px;
+        }
+
+        .cost-summary {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        #bookingClosed {
+            display: none;
+            background-color: #f44336;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>DIGI BUS</h1>
+            <h3><i>Heaven on wheels</i></h3>
+        </div>
+    </header>
+
+    <main>
+        <section class="booking-form" id="bookingFormSection">
+            <h2>Book Your Bus Ticket</h2>
+            <form id="bookingForm" onsubmit="return showConfirmation(event)">
+                <label for="from">From:</label>
+                <input type="text" id="from" name="From" placeholder="Boarding " required>
+
+                <label for="to">To:</label>
+                <input type="text" id="to" name="To" placeholder="Destination" required>
+
+                <label for="departure-date">Departure Date:</label>
+                <input type="date" id="departure-date" name="departure-date" required>
+
+                <label for="passengers">Number of Passengers:</label>
+                <input type="number" id="passengers" name="passengers"min='1'max='20' required>
+                
+
+                <label for="bus-type">Bus Type:</label>
+                <select id="bus-type" name="bus-type" required>
+                    <option value="seater">Seater</option>
+                    <option value="semi-sleepernonac">Semi-Sleeper/non AC</option>
+                    <option value="semi-sleeperac">Semi-sleeper/with AC</option>
+                </select>
+
+                <div class="seat-selection" id="seatSelection">
+                    <!-- Seat layout will be generated here -->
+                </div>
+
+                <div class="cost-summary" id="costSummary">
+                    <p>Total Cost: ₹<span id="totalCost">0.00</span></p>
+                </div>
+
+                <div class="payment-methods">
+                    <p><strong>Payment Method:</strong></p>
+                    <label>
+                        <input type="radio" name="payment" value="credit-card" required>
+                        Credit Card
+                    </label><br>
+                    <label>
+                        <input type="radio" name="payment" value="paypal" required>
+                        UPI
+                    </label><br>
+                    <label >
+                        <input type="text" name="coupen" id="coupen">
+                        Coupen
+                    </label><br>
+                   
+                </div>
+
+                <button type="submit">Book Now</button>
+            </form>
+        </section>
+
+        <!-- Confirmation Message -->
+        <div id="confirmation" class="confirmation-message">
+            <h1><b><i>Welcome to our chariot</i></b></h1>
+            <p>Your booking has been confirmed!</p>
+            <p id="confirmationDetails"></p>
+        </div>
+
+        <!-- Booking Closed Message -->
+        <div id="bookingClosed">
+            <p>Booking Closed: All tickets have been sold out!</p>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 BusTicket. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // Maximum number of available seats
+        const MAX_SEATS = 20;
+
+        // Sample booked seats (these can come from a backend server or database in a real application)
+        const bookedSeats = [];
+
+        // Seat layout definition
+        const seatLayout = [
+            ['A1', 'A2', 'A3', 'A4', 'A5'],
+            ['B1', 'B2', 'B3', 'B4', 'B5'],
+            ['C1', 'C2', 'C3', 'C4', 'C5'],
+            ['D1', 'D2', 'D3', 'D4', 'D5'],
+        ];
+
+        let selectedSeats = [];
+        let availableSeats = MAX_SEATS - bookedSeats.length;
+
+        // Base prices for bus types in INR
+        const busPrices = {
+            seater: 500,  // Price per passenger in INR
+            'semi-sleepernonac': 600,
+            'semi-sleeperac':800
+        };
+
+        // Generate seat elements dynamically
+        function generateSeats() {
+            const seatSelectionDiv = document.getElementById('seatSelection');
+            seatLayout.forEach(row => {
+                row.forEach(seat => {
+                    const seatDiv = document.createElement('div');
+                    seatDiv.classList.add('seat');
+                    seatDiv.textContent = seat;
+
+                    // Mark the seat as booked if it's in the bookedSeats array
+                    if (bookedSeats.includes(seat)) {
+                        seatDiv.classList.add('booked');
+                        seatDiv.style.cursor = 'not-allowed';
+                    } else {
+                        seatDiv.addEventListener('click', () => selectSeat(seatDiv, seat));
+                    }
+
+                    seatSelectionDiv.appendChild(seatDiv);
+                });
+            });
+        }
+         
+         
+        // Handle seat selection
+        function selectSeat(seatDiv, seat) {
+            if (seatDiv.classList.contains('booked')) {
+                alert('This seat is already booked!');
+                return;
+            }
+
+            if (selectedSeats.length >= availableSeats) {
+                alert('Sorry, no more seats available!');
+                return;
+            }
+
+            // Toggle seat selection
+            if (seatDiv.classList.contains('selected')) {
+                seatDiv.classList.remove('selected');
+                selectedSeats = selectedSeats.filter(s => s !== seat);
+            } else {
+                seatDiv.classList.add('selected');
+                selectedSeats.push(seat);
+            }
+
+            updateCost();
+        }
+
+        // Update total cost based on selected seats
+        function updateCost() {
+            const passengers = document.getElementById('passengers').value;
+            const busType = document.getElementById('bus-type').value;
+
+            const seatPrice = busPrices[busType];
+            const totalCost = selectedSeats.length * seatPrice ;
+            document.getElementById('totalCost').textContent = totalCost.toFixed(2);
+        }
+
+        // Handle form submission and display confirmation
+        function showConfirmation(event) {
+            event.preventDefault(); // Prevent page refresh
+
+            if (selectedSeats.length === 0) {
+                alert('Please select at least one seat!');
+                return;
+            }
+
+            // Get form values
+            const from = document.getElementById('from').value;
+            const to = document.getElementById('to').value;
+            const departureDate = document.getElementById('departure-date').value;
+            const passengers = document.getElementById('passengers').value;
+            const busType = document.getElementById('bus-type').value;
+            const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+            
+            // Create confirmation message
+            const confirmationDetails = `
+           
+                From: ${from} <br>
+                To: ${to} <br>
+                Departure Date: ${departureDate} <br>
+                Passengers: ${passengers} <br>
+                Bus Type: ${busType} <br>
+                Selected Seats: ${selectedSeats.join(', ')} <br>
+                Payment Method: ${paymentMethod} <br>
+                Total Cost: ₹${document.getElementById('totalCost').textContent}
+            `;
+
+            // Display the confirmation message
+            document.getElementById('confirmationDetails').innerHTML = confirmationDetails;
+            document.getElementById('confirmation').style.display = 'block';
+
+            // Optionally, hide the form after booking
+            document.querySelector('.booking-form').style.display = 'none';
+
+            // Mark the selected seats as booked (update the bookedSeats array)
+            selectedSeats.forEach(seat => {
+                bookedSeats.push(seat);
+            });
+
+            // Mark the seats as booked visually
+            const seatDivs = document.querySelectorAll('.seat');
+            seatDivs.forEach(seatDiv => {
+                if (selectedSeats.includes(seatDiv.textContent)) {
+                    seatDiv.classList.add('booked');
+                    seatDiv.classList.remove('selected');
+                    seatDiv.style.cursor = 'not-allowed';
+                }
+            });
+
+            availableSeats -= selectedSeats.length;
+
+            // Check if seats are sold out
+            if (availableSeats <= 0) {
+                document.getElementById('bookingFormSection').style.display = 'none';
+                document.getElementById('bookingClosed').style.display = 'block';
+            }
+        }
+
+        // Initialize the seat layout on page load
+        window.onload = generateSeats;
+    </script>
+</body>
+</html>
